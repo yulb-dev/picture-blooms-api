@@ -8,6 +8,16 @@ router.get('/cardList', (req, res) => {
     })
 
 })
+
+//刷新页面
+router.get('/isRefresh', (req, res) => {
+    GoodsCard.aggregate([{ $sample: { size: 6 } }], (err, data) => {
+        if (err) {
+            res.send('出错了')
+        }
+        res.send(data)
+    })
+})
 // router.get('/', (req, res) => {
 //     GoodsCard.create({ userid: '123' }, (err, data) => {
 //         if (err) {
