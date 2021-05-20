@@ -26,4 +26,15 @@ router.get('/getCard', (req, res) => {
     })
 
 })
+
+router.get('/delFavorite', (req, res) => {
+    User.findByIdAndUpdate(req.query.userid, { $pull: { favorites: req.query.cardid } }, (err, data) => {
+        if (err) {
+            res.send(err)
+        }
+        res.send(data)
+    })
+
+})
+
 module.exports = router
