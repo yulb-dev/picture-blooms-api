@@ -64,4 +64,54 @@ router.post('/', (req, res) => {
 
 })
 
+router.post('/setUp', (req, res) => {
+    const form = formidable({ multiples: true, maxFileSize: 20 * 1024 * 1024 });
+    form.parse(req, (err, fields, files) => {
+        const { name, gender, introduction, id } = fields
+        const { userAvatar } = files
+        if (userAvatar) {
+            let imgSuffix = userAvatar.name.slice(userAvatar.name.lastIndexOf('.'))
+            let avatar = port + '/img/userAvatar/' + id + imgSuffix
+            User.findByIdAndUpdate(id, { name, gender, introduction, avatar }, (err, data) => {
+                if (err) {
+                    res.send(err)
+                }
+                else {
+                    // //创建可读流
+                    var rs = fs.createReadStream(userAvatar.path)
+                    // //创建可写流
+                    var ws = fs.createWriteStream(path.join(__dirname, '..', 'public', 'img', 'userAvatar', id + imgSuffix))
+                    // 可读流关闭的事件
+                    rs.once('close', function () {
+                        //当可读流关闭时，关闭可写流
+                        ws.end()
+                        res.send({ name, gender, introduction, avatar })
+                    })
+                    //读文件时会触发此事件
+                    rs.on('data', function (filedata) {
+                        //data：读到的数据
+                        ws.write(filedata)
+                    })
+                }
+            })
+        }
+        else {
+            User.findByIdAndUpdate(id, { name, gender, introduction }, (err, data) => {
+                if (err) {
+                    res.send(err)
+                }
+                else {
+                    res.send({ name, gender, introduction, avatar: data.avatar })
+                }
+            })
+        }
+    })
+
+})
+
+router.post('/exit', (req, res) => {
+    req.session.destroy()
+    res.send(true)
+})
+
 module.exports = router
