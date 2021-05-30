@@ -1,14 +1,6 @@
 const mongoose = require('mongoose')
 
 var goodsCardchema = new mongoose.Schema({
-    username: {   //作者名
-        type: String,
-        default: 'xx'
-    },
-    useravatar: {  //作者头像
-        type: String,
-        default: 'http://118.190.63.62:6060/img/userAvatar/5f3cd6df23d736051836f48e.jpg'
-    },
     userid: {   //作者id
         type: String,
     },
