@@ -27,14 +27,17 @@ router.get('/getCard', (req, res) => {
 
 })
 
-router.get('/delFavorite', (req, res) => {
-    User.findByIdAndUpdate(req.query.userid, { $pull: { favorites: req.query.cardid } }, (err, data) => {
+router.post('/delFavorite', (req, res) => {
+    const { cardid, userid } = req.body
+    User.findByIdAndUpdate(userid, { $pull: { favorites: cardid } }, (err, data) => {
         if (err) {
             res.send(err)
+            return
         }
-        res.send(data)
+        GoodsCard.findByIdAndUpdate(cardid, { $inc: { likesnum: -1 } }, (err2, data2) => {
+            res.send({})
+        })
     })
-
 })
 
 //获取我的动态中的卡片信息

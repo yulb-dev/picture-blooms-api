@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const formidable = require('formidable');
 const User = require('../model/users')
+const Card = require('../model/goodsCard')
 const fs = require('fs')
 const path = require('path')
 //当前服务器 ip 地址
@@ -112,6 +113,55 @@ router.post('/setUp', (req, res) => {
 router.post('/exit', (req, res) => {
     req.session.destroy()
     res.send(true)
+})
+
+router.post('/pushCard', (req, res) => {
+    const form = formidable({ multiples: true, maxFileSize: 20 * 1024 * 1024 });
+    form.parse(req, (err, fields, files) => {
+        if (files.img) {
+            //修改文件名字
+            let name = files.img.name.slice(files.img.name.lastIndexOf('.'))
+            Card.create({ title: fields.title, labels: fields.labels.split(","), content: fields.content, userid: fields.userid }, (err, data) => {
+                if (err) {
+                    res.send(err)
+                }
+                else {
+                    let imgsrc = port + '/img/cardImg/' + data._id + name
+                    Card.findByIdAndUpdate(data._id, { imgsrc }, (err2, data2) => {
+                        if (err2) {
+                            res.send(err2)
+                        }
+                        else {
+                            // //创建可读流
+                            var rs = fs.createReadStream(files.img.path)
+                            // //创建可写流
+                            var ws = fs.createWriteStream(path.join(__dirname, '..', 'public', 'img', 'cardImg', data2._id + name))
+                            // 可读流关闭的事件
+                            rs.once('close', function () {
+                                //当可读流关闭时，关闭可写流
+                                User.findByIdAndUpdate(fields.userid, { $push: { dynamic: data2._id } }, (err3, data3) => {
+                                    ws.end()
+                                    res.send(data2._id)
+                                })
+                            })
+                            //读文件时会触发此事件
+                            rs.on('data', function (filedata) {
+                                //data：读到的数据
+                                ws.write(filedata)
+                            })
+                        }
+                    })
+
+                }
+            })
+
+        }
+        else {
+            res.send({ keyValue: '出错了！' })
+        }
+
+    });
+
 })
 
 module.exports = router

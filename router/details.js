@@ -28,4 +28,41 @@ router.get('/getcomment', (req, res) => {
         })
     })
 })
+
+router.post('/addfavorite', (req, res) => {
+    const { cardid, userid } = req.body
+    User.findByIdAndUpdate(userid, { $push: { favorites: cardid } }, (err, data) => {
+        if (err) {
+            res.send(err)
+        }
+        Cards.findByIdAndUpdate(cardid, { $inc: { likesnum: 1 } }, (err2, data2) => {
+            res.send({})
+        })
+    })
+
+})
+
+router.get('/getMessage', (req, res) => {
+    const { id } = req.query
+    Cards.findById(id, (err, data) => {
+        if (data) {
+            User.findById(data.userid, (err2, data2) => {
+                if (data2) {
+                    const { title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid } = data
+
+                    let cardMessage = { title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid, useravatar: data2.avatar, username: data2.name }
+                    res.send(cardMessage)
+                }
+                else {
+                    res.send(null)
+                    return
+                }
+            })
+        }
+        else {
+            res.send(null)
+        }
+    })
+
+})
 module.exports = router
