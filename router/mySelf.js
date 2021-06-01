@@ -84,5 +84,22 @@ router.get('/pushIdol', (req, res) => {
     })
 
 })
+//删除动态
+router.get('/pullDynamic', (req, res) => {
+    const { id } = req.query
+    GoodsCard.findByIdAndRemove(id, (err, data) => {
+        if (err) {
+            res.send(err)
+            return
+        }
+        User.findByIdAndUpdate(data.userid, { $pull: { dynamic: data._id } }, (err2, data2) => {
+            if (err2) {
+                res.send(err2)
+                return
+            }
+            res.send({})
+        })
+    })
+})
 
 module.exports = router
