@@ -24,6 +24,10 @@ var goodsCardchema = new mongoose.Schema({
         type: Date,
         default: new Date()
     },
+    notdel: {  //删除
+        type: Boolean,
+        default: true
+    },
     likesnum: {   //点赞数量
         type: Number,
         default: 0

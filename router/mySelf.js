@@ -87,7 +87,7 @@ router.get('/pushIdol', (req, res) => {
 //删除动态
 router.get('/pullDynamic', (req, res) => {
     const { id } = req.query
-    GoodsCard.findByIdAndRemove(id, (err, data) => {
+    GoodsCard.findByIdAndUpdate(id, { notdel: false }, (err, data) => {
         if (err) {
             res.send(err)
             return

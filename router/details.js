@@ -48,9 +48,9 @@ router.get('/getMessage', (req, res) => {
         if (data) {
             User.findById(data.userid, (err2, data2) => {
                 if (data2) {
-                    const { title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid } = data
+                    const { title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid, notdel } = data
 
-                    let cardMessage = { title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid, useravatar: data2.avatar, username: data2.name }
+                    let cardMessage = { notdel, title, imgsrc, labels, content, ctime, likesnum, comment, _id, userid, useravatar: data2.avatar, username: data2.name }
                     res.send(cardMessage)
                 }
                 else {
