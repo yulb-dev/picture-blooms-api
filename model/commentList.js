@@ -2,7 +2,12 @@ const mongoose = require('mongoose')
 
 var commentSchema = new mongoose.Schema({
     userid: {   //谁评论的
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    cardid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GoodsCard'
     },
     content: {  //内容
         type: String,

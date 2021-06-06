@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 
 var goodsCardchema = new mongoose.Schema({
     userid: {   //作者id
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
     title: {  //标题
         type: String,

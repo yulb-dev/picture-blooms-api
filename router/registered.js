@@ -5,6 +5,7 @@ const User = require('../model/users')
 const Card = require('../model/goodsCard')
 const fs = require('fs')
 const path = require('path')
+const images = require("images");
 //当前服务器 ip 地址
 const port = require('./port')
 
@@ -13,14 +14,18 @@ router.post('/', (req, res) => {
     form.parse(req, (err, fields, files) => {
         if (files.userAvatar) {
             //修改文件名字
-            let name = files.userAvatar.name.slice(files.userAvatar.name.lastIndexOf('.'))
             User.create({ name: fields.username, password: fields.password }, (err, data) => {
                 if (err) {
                     res.send(err)
                 }
                 else {
-                    let avatar = port + '/img/userAvatar/' + data._id + name
-                    User.findByIdAndUpdate(data._id, { avatar: avatar }, (err2, data2) => {
+                    images(files.userAvatar.path)
+                        .save(path.join(__dirname, '..', 'public', 'img', 'avatarcompress', data._id + '.jpg'), {
+                            quality: 50
+                        });
+                    let avatar = port + '/img/avatarcompress/' + data._id + '.jpg'
+                    let name = files.userAvatar.name.slice(files.userAvatar.name.lastIndexOf('.'))
+                    User.findByIdAndUpdate(data._id, { avatar }, (err2, data2) => {
                         if (err2) {
                             res.send(err2)
                         }
@@ -71,8 +76,12 @@ router.post('/setUp', (req, res) => {
         const { name, gender, introduction, id } = fields
         const { userAvatar } = files
         if (userAvatar) {
+            images(userAvatar.path)
+                .save(path.join(__dirname, '..', 'public', 'img', 'avatarcompress', id + '.jpg'), {
+                    quality: 50
+                });
+            let avatar = port + '/img/avatarcompress/' + id + '.jpg'
             let imgSuffix = userAvatar.name.slice(userAvatar.name.lastIndexOf('.'))
-            let avatar = port + '/img/userAvatar/' + id + imgSuffix
             User.findByIdAndUpdate(id, { name, gender, introduction, avatar }, (err, data) => {
                 if (err) {
                     res.send(err)
@@ -126,7 +135,11 @@ router.post('/pushCard', (req, res) => {
                     res.send(err)
                 }
                 else {
-                    let imgsrc = port + '/img/cardImg/' + data._id + name
+                    images(files.img.path)
+                        .save(path.join(__dirname, '..', 'public', 'img', 'Compresspicture', data._id + '.jpg'), {
+                            quality: 50
+                        });
+                    let imgsrc = port + '/img/Compresspicture/' + data._id + '.jpg'
                     Card.findByIdAndUpdate(data._id, { imgsrc }, (err2, data2) => {
                         if (err2) {
                             res.send(err2)
@@ -139,7 +152,7 @@ router.post('/pushCard', (req, res) => {
                             // 可读流关闭的事件
                             rs.once('close', function () {
                                 //当可读流关闭时，关闭可写流
-                                User.findByIdAndUpdate(fields.userid, { $push: { dynamic: data2._id } }, (err3, data3) => {
+                                User.findByIdAndUpdate(fields.userid, { $push: { dynamic: { $each: [data2._id], $position: 0 } } }, (err3, data3) => {
                                     ws.end()
                                     res.send(data2._id)
                                 })
@@ -154,14 +167,36 @@ router.post('/pushCard', (req, res) => {
 
                 }
             })
-
         }
         else {
             res.send({ keyValue: '出错了！' })
         }
-
     });
-
 })
+
+router.post('/goEdit', (req, res) => {
+    const form = formidable({ multiples: true, maxFileSize: 20 * 1024 * 1024 });
+    form.parse(req, (err, fields, files) => {
+        let { title, labels, content, cardid } = fields
+        labels = labels.split(",")
+        if (files.img) {
+            images(files.img.path)
+                .save(path.join(__dirname, '..', 'public', 'img', 'Compresspicture', cardid + '.jpg'), {
+                    quality: 50
+                });
+            // let name = files.img.name.slice(files.img.name.lastIndexOf('.'))
+            Card.findByIdAndUpdate(cardid, { labels, title, content }, (err, data) => {
+                if (err) {
+                    res.send(err)
+                }
+                else {
+                    res.send({})
+                    return
+                }
+            })
+        }
+    });
+})
+
 
 module.exports = router

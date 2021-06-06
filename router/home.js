@@ -4,7 +4,10 @@ const GoodsCard = require('../model/goodsCard')
 const User = require('../model/users')
 
 router.get('/cardList', (req, res) => {
-    GoodsCard.aggregate([{ $sample: { size: parseInt(req.query.page) * 6 } }], (err, data) => {
+    GoodsCard.aggregate([
+        { $match: { notdel: true } },
+        { $sample: { size: parseInt(req.query.page) * 6 } }
+    ], (err, data) => {
         if (err) {
             res.send('出错了')
         }
@@ -15,7 +18,10 @@ router.get('/cardList', (req, res) => {
 
 //刷新页面
 router.get('/isRefresh', (req, res) => {
-    GoodsCard.aggregate([{ $sample: { size: 6 } }], (err, data) => {
+    GoodsCard.aggregate([
+        { $match: { notdel: true } },
+        { $sample: { size: 6 } }
+    ], (err, data) => {
         if (err) {
             res.send('出错了')
         }
@@ -31,16 +37,5 @@ router.get('/userMessage', (req, res) => {
             res.send(null)
     })
 })
-
-
-// router.get('/', (req, res) => {
-//     GoodsCard.create({ userid: '123' }, (err, data) => {
-//         if (err) {
-//             console.log(err)
-//         }
-//         res.send(data)
-//     })
-
-// })
 
 module.exports = router
