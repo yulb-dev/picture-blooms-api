@@ -20,4 +20,18 @@ router.get('/', (req, res) => {
             })
     })
 })
+
+router.get('/getLabelsInfo', (req, res) => {
+    Card.find({ labels: { $elemMatch: { $eq: req.query.labels } }, notdel: true })
+        .populate('userid', "name avatar")
+        .sort({ likesnum: -1 })
+        .exec((err, data) => {
+            if (err) {
+                res.send(err)
+                return
+            }
+            res.send(data)
+        })
+})
+
 module.exports = router

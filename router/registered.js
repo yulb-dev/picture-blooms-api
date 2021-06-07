@@ -185,16 +185,16 @@ router.post('/goEdit', (req, res) => {
                     quality: 50
                 });
             // let name = files.img.name.slice(files.img.name.lastIndexOf('.'))
-            Card.findByIdAndUpdate(cardid, { labels, title, content }, (err, data) => {
-                if (err) {
-                    res.send(err)
-                }
-                else {
-                    res.send({})
-                    return
-                }
-            })
         }
+        Card.findByIdAndUpdate(cardid, { labels, title, content }, (err, data) => {
+            if (err) {
+                res.send(err)
+            }
+            else {
+                res.send({})
+                return
+            }
+        })
     });
 })
 
