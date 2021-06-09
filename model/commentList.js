@@ -21,7 +21,7 @@ var commentSchema = new mongoose.Schema({
         default: 0
     },
 })
-//db.goods.find({class:{$elemMatch:{$eq:'精选'}}}) 查找数组中是否含有某个值
+
 const Comment = mongoose.model('CommentSchema', commentSchema, 'comment')
 
 module.exports = Comment

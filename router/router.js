@@ -4,6 +4,7 @@ const registered = require('./registered')
 const login = require('./login')
 const details = require('./details')
 const personalSpace = require('./personalSpace')
+const discoverPage = require('./discoverPage')
 
 //导出
 module.exports = function (app) {
@@ -13,4 +14,5 @@ module.exports = function (app) {
     app.use('/login', login)
     app.use('/details', details)
     app.use('/personalSpace', personalSpace)
+    app.use('/discoverPage', discoverPage)
 }
