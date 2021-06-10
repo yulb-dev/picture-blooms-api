@@ -42,9 +42,12 @@ router.post('/delFavorite', (req, res) => {
 
 //获取我的动态中的卡片信息
 router.get('/dynamic', (req, res) => {
-    GoodsCard.findById(req.query.id, (err, data) => {
-        res.send(data)
-    })
+    GoodsCard
+        .findById(req.query.id)
+        .sort({ ctime: -1 })
+        .exec((err,data)=>{
+            res.send(data)
+        })
 })
 //获取我的关注中的用户信息
 router.get('/idol', (req, res) => {

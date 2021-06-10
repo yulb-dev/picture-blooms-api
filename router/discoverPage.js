@@ -5,11 +5,6 @@ const Card = require('../model/goodsCard')
 const User = require('../model/users')
 
 router.get('/', (req, res) => {
-    // Label.create([{ value: '台词' }, { value: 'aaaa' }], (err, data) => {
-    //     if (err) {
-    //         return
-    //     }
-    // })
     Card.aggregate([{ $match: { notdel: true } }, { $sample: { size: 6 } }])
         .exec((err, cardList) => {
             let arr = []

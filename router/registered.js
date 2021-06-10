@@ -3,6 +3,7 @@ const router = express.Router()
 const formidable = require('formidable');
 const User = require('../model/users')
 const Card = require('../model/goodsCard')
+const Label = require('../model/labels')
 const fs = require('fs')
 const path = require('path')
 const images = require("images");
@@ -130,11 +131,22 @@ router.post('/pushCard', (req, res) => {
         if (files.img) {
             //修改文件名字
             let name = files.img.name.slice(files.img.name.lastIndexOf('.'))
-            Card.create({ title: fields.title, labels: fields.labels.split(","), content: fields.content, userid: fields.userid }, (err, data) => {
+            let labelsArr = fields.labels.split(",")
+            Card.create({ title: fields.title, labels: labelsArr, content: fields.content, userid: fields.userid }, (err, data) => {
                 if (err) {
                     res.send(err)
                 }
                 else {
+                    for (let i = 0; i < labelsArr.length; i++) {
+                        labelsArr[i] = {
+                            value: labelsArr[i]
+                        }
+                    }
+                    Label.create(labelsArr, (err, data) => {
+                        if (err) {
+                            return
+                        }
+                    })
                     images(files.img.path)
                         .save(path.join(__dirname, '..', 'public', 'img', 'Compresspicture', data._id + '.jpg'), {
                             quality: 50
@@ -152,7 +164,7 @@ router.post('/pushCard', (req, res) => {
                             // 可读流关闭的事件
                             rs.once('close', function () {
                                 //当可读流关闭时，关闭可写流
-                                User.findByIdAndUpdate(fields.userid, { $push: { dynamic: { $each: [data2._id], $position: 0 } } }, (err3, data3) => {
+                                User.findByIdAndUpdate(fields.userid, { $push: { dynamic: data2._id } }, (err3, data3) => {
                                     ws.end()
                                     res.send(data2._id)
                                 })
@@ -187,6 +199,16 @@ router.post('/goEdit', (req, res) => {
             // let name = files.img.name.slice(files.img.name.lastIndexOf('.'))
         }
         Card.findByIdAndUpdate(cardid, { labels, title, content }, (err, data) => {
+            for (let i = 0; i < labels.length; i++) {
+                labels[i] = {
+                    value: labels[i]
+                }
+            }
+            Label.create(labels, (err, data) => {
+                if (err) {
+                    return
+                }
+            })
             if (err) {
                 res.send(err)
             }
