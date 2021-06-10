@@ -35,6 +35,6 @@ node index.js
 ```
 
 ## 最后
-1、注意检查 "/index.js" 里的 corsOptions 的"origin"值，始终与前端项目地址保持一致，因为这涉及到跨域问题
+1、注意检查 "/index.js" 里的 "Access-Control-Allow-Origin"值，始终与前端项目地址保持一致，因为这涉及到跨域问题
 2、"/router/port.js"里的port值为上传文件的地址，如果你不在服务器部署此项目，则不需要考虑这个问题
 
